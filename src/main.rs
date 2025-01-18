@@ -1,7 +1,7 @@
 use std::{
     env,
     fs::{self, OpenOptions},
-    io::{self, BufWriter, Write, Read},
+    io::{self, BufWriter, Read, Write}, ops::Index,
 };
 use colored::Colorize;
 
@@ -70,7 +70,22 @@ impl Todo {
         }
     }
 
-    pub fn done(&mut self, arg)
+    pub fn done(&mut self, args: &[String]) {
+        if args.is_empty() {
+            eprintln!("❌ Not enough arguments to add a task.");
+        } else {
+            let index: usize = args[0].parse().expect("❌ Invalid task number.");
+
+            if index < self.todo.len() {
+                let task = self.todo.index(index-1).clone().replace("[ ]", "[*]");
+                self.todo.remove(index-1);
+                println!("{}",task);
+                println!("✅ Task '{}' marked as done!", task);
+                self.todo.push(task);
+                self.save();
+            }
+        }
+    }
     /// Lists all tasks in the todo list
     pub fn list(&self) {
         if self.todo.is_empty() {
@@ -113,6 +128,7 @@ fn main() {
             "list" => todo.list(),
             "add" => todo.add(&args[2..]),
             "rm" => todo.rm(&args[2..]),
+            "done" => todo.done(&args[2..]),
             _ => eprintln!("❓ Unknown command: {}", command),
         }
     } else {
