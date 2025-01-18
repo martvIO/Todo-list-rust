@@ -88,6 +88,21 @@ impl Todo {
             }
         }
     }
+
+    pub fn edit(&mut self, args: &[String]){
+        if args.is_empty() {
+            eprintln!("❌ Not enough arguments to add a task.");
+        } else {
+            let index: usize = args[0].parse().expect("❌ Invalid task number.");
+            
+            let symbol: String = String::from("[ ] ");
+            let new_task = symbol + &args[1].to_string();
+            println!("{}",new_task);
+            self.todo[index-1] = new_task;
+            println!("{:?}",self.todo);
+            self.save();
+        }
+    }
     /// Lists all tasks in the todo list
     pub fn list(&self) {
         if self.todo.is_empty() {
@@ -133,6 +148,7 @@ fn main() {
             "add" => todo.add(&args[2..]),
             "rm" => todo.rm(&args[2..]),
             "done" => todo.done(&args[2..]),
+            "edit" => todo.edit(&args[2..]),
             _ => eprintln!("❓ Unknown command: {}", command),
         }
     } else {
