@@ -46,7 +46,9 @@ impl Todo {
             eprintln!("❌ Not enough arguments to add a task.");
         } else {
             for arg in args {
-                self.todo.push(arg.to_string());
+                let symbol: String = String::from("[ ] ");
+                let task: String = symbol + &arg;
+                self.todo.push(task);
             }
             println!("✅ Task(s) added successfully!");
             self.save();
@@ -76,7 +78,7 @@ impl Todo {
         } else {
             let index: usize = args[0].parse().expect("❌ Invalid task number.");
 
-            if index < self.todo.len() {
+            if index <= self.todo.len() {
                 let task = self.todo.index(index-1).clone().replace("[ ]", "[*]");
                 self.todo.remove(index-1);
                 println!("{}",task);
@@ -119,8 +121,10 @@ impl Todo {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let file_path = "todo_list.txt"; // Define the file path for saving tasks
-    let mut todo = Todo::new(file_path);
+
+    let file_path: String = env::var("TODO_FILE_PATH").unwrap_or("todo_list.txt".to_string());
+
+    let mut todo = Todo::new(&file_path);
 
     if args.len() > 1 {
         let command = &args[1];
