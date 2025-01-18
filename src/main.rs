@@ -103,6 +103,13 @@ impl Todo {
             self.save();
         }
     }
+
+    pub fn reset(&mut self) {
+        let empty_todo: Vec<String> = Vec::new();
+        self.todo = empty_todo;
+        self.save();
+    }
+    
     /// Lists all tasks in the todo list
     pub fn list(&self) {
         if self.todo.is_empty() {
@@ -149,6 +156,7 @@ fn main() {
             "rm" => todo.rm(&args[2..]),
             "done" => todo.done(&args[2..]),
             "edit" => todo.edit(&args[2..]),
+            "reset" => todo.reset(),
             _ => eprintln!("❓ Unknown command: {}", command),
         }
     } else {
