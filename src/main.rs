@@ -105,9 +105,54 @@ impl Todo {
     }
 
     pub fn reset(&mut self) {
-        let empty_todo: Vec<String> = Vec::new();
-        self.todo = empty_todo;
+        self.todo.clear();
         self.save();
+    }
+
+    pub fn raw(&mut self, args: &[String]) {
+        let option = args[0].to_string();
+        let todo: String = String::from("todo");
+
+        let mut char = "";
+        if option == todo {
+            char = "[ ]";
+        } else {
+            char = "[*]";
+        }
+        
+        let mut todo_list = Vec::new();
+        for task in self.todo.clone() {
+            if task.contains(char) {
+                todo_list.push(task);
+            }
+        }
+
+        if todo_list.is_empty() {
+            println!("📭 Your todo list is empty!");
+            return;
+        }
+
+        let stdout = io::stdout();
+        let mut writer = BufWriter::new(stdout);
+
+        for (number, task) in todo_list.iter().enumerate() {
+            let number = (number + 1).to_string().bold();
+            let (symbol, task_content) = if task.len() > 4 {
+                (&task[..4], &task[4..])
+            } else {
+                ("", task.as_str())
+            };
+
+        let formatted_task = match symbol {
+            "[*] " => format!("{} {}\n", number, task_content.strikethrough()),
+            "[ ] " => format!("{} {}\n", number, task_content),
+            _ => format!("{} {}\n", number, task),
+        };
+
+        writer
+            .write_all(formatted_task.as_bytes())
+            .expect("Failed to write to stdout");
+        }
     }
     
     /// Lists all tasks in the todo list
@@ -157,6 +202,7 @@ fn main() {
             "done" => todo.done(&args[2..]),
             "edit" => todo.edit(&args[2..]),
             "reset" => todo.reset(),
+            "raw" => todo.raw(&args[2..]),
             _ => eprintln!("❓ Unknown command: {}", command),
         }
     } else {
